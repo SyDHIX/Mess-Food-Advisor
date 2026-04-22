@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: mess-advisor
+    runtime: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/mess-advisor-1.0.0.jar
+    envVars:
+      - key: PORT
+        value: 8080

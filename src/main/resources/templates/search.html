@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Search – Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="back-btn">← Back</a>
+  <h1>🔍 Global Search</h1>
+</div>
+
+<div class="page" style="padding-top:20px">
+  <!-- Search bar -->
+  <form method="get" action="/search" class="search-bar">
+    <input type="text" name="q" th:value="${query}"
+           placeholder="Search dishes, days, categories… (e.g. paneer, monday, dal)"
+           autofocus/>
+  </form>
+
+  <!-- Quick filters -->
+  <div class="chips-row">
+    <a th:each="f : ${quickFilters}"
+       th:href="@{/search(q=${f})}"
+       th:text="${f}"
+       class="chip"></a>
+  </div>
+
+  <div class="result-label" th:text="${resultLabel}"></div>
+
+  <!-- Results -->
+  <div th:if="${results.isEmpty()}">
+    <p style="color:var(--text-muted);padding:30px 0">😕 No items found. Try another search term.</p>
+  </div>
+
+  <div th:unless="${results.isEmpty()}">
+    <div th:each="sr,iter : ${results}">
+      <!-- Group header when day+meal changes -->
+      <div th:if="${iter.index == 0 or (results[iter.index - 1].day() + results[iter.index - 1].meal()) != (sr.day() + sr.meal())}"
+           class="result-group-label"
+           th:text="'📅 ' + ${sr.day()} + ' — ' + ${sr.meal()}"></div>
+
+      <div class="result-card">
+        <div>
+          <div class="rc-name" th:text="${sr.item().name}"></div>
+          <div class="rc-meta"
+               th:text="${sr.day()} + '  ·  ' + ${sr.meal()} + '  ·  🔥 ' + ${sr.item().calories} + ' Kcal'"></div>
+        </div>
+        <div class="rc-right">
+          <div th:unless="${sr.item().staple}"
+               class="rc-rating"
+               th:classappend="${sr.item().rating >= 4.0 ? 'rating-good' : (sr.item().rating >= 3.0 ? 'rating-ok' : 'rating-bad')}"
+               th:text="${#numbers.formatDecimal(sr.item().rating,1,1)}"></div>
+          <div class="rc-cat"
+               th:classappend="'cat-' + ${sr.item().category.toLowerCase()}"
+               th:text="${sr.item().category.toUpperCase()}"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

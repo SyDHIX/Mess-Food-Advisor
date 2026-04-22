@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Meal Log – Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="back-btn">← Back</a>
+  <h1>📝 Meal Log</h1>
+</div>
+
+<div class="page" style="padding-top:20px">
+
+  <!-- Log a meal -->
+  <div class="log-section">
+    <h2>🍽️ What did you eat?</h2>
+
+    <div class="dropdown-row">
+      <label for="daySelect">Day:</label>
+      <select id="daySelect">
+        <option th:each="d : ${days}" th:value="${d}" th:text="${d}"
+                th:selected="${d == today}"></option>
+      </select>
+      <label for="mealSelect">Meal:</label>
+      <select id="mealSelect">
+        <option th:each="m : ${mealTypes}" th:value="${m}" th:text="${m}"></option>
+      </select>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">Click a dish to log it:</p>
+    <div id="dishList"></div>
+  </div>
+
+  <!-- History -->
+  <div class="log-section">
+    <div class="log-history-header">
+      <h2>📋 Your Meal History</h2>
+      <form method="post" action="/meallog/clear"
+            onsubmit="return confirm('Clear all meal history?')">
+        <button type="submit" class="clear-btn">🗑️ Clear History</button>
+      </form>
+    </div>
+
+    <div th:if="${logs.isEmpty()}">
+      <p style="color:var(--text-muted);padding:16px 0">
+        No meals logged yet. Start by clicking a dish above!
+      </p>
+    </div>
+
+    <div th:unless="${logs.isEmpty()}">
+      <div th:each="entry : ${logs}" class="log-card">
+        <div class="lc-name" th:text="${entry[3]}"></div>
+        <div class="lc-info" th:text="${entry[1]} + ' · ' + ${entry[2]} + ' · ' + ${entry[0]}"></div>
+      </div>
+      <p style="font-size:13px;font-weight:600;color:var(--accent-light);margin-top:8px"
+         th:text="'Total meals logged: ' + ${logCount}"></p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const daySelect  = document.getElementById('daySelect');
+  const mealSelect = document.getElementById('mealSelect');
+  const dishList   = document.getElementById('dishList');
+
+  function loadDishes() {
+    const day  = daySelect.value;
+    const meal = mealSelect.value;
+    fetch('/meallog/items?day=' + encodeURIComponent(day) + '&meal=' + encodeURIComponent(meal))
+      .then(r => r.json())
+      .then(items => {
+        dishList.innerHTML = '';
+        items.forEach(item => {
+          const btn = document.createElement('button');
+          btn.className = 'dish-btn';
+          btn.textContent = '➕  ' + item.name + '  (' + item.calories + ' Kcal)';
+          btn.addEventListener('click', () => logDish(day, meal, item.name));
+          dishList.appendChild(btn);
+        });
+      });
+  }
+
+  function logDish(day, meal, dish) {
+    fetch('/meallog/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'day=' + encodeURIComponent(day) +
+            '&meal=' + encodeURIComponent(meal) +
+            '&dish=' + encodeURIComponent(dish)
+    }).then(() => {
+      showToast('✅ Logged: ' + dish);
+      setTimeout(() => location.reload(), 800);
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  daySelect.addEventListener('change', loadDishes);
+  mealSelect.addEventListener('change', loadDishes);
+  loadDishes();
+</script>
+</body>
+</html>

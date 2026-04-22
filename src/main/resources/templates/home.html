@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bennett Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <span class="emoji">🍛</span>
+    <h1>Bennett Mess Advisor</h1>
+    <p class="tagline">Know your plate before you go 🥂</p>
+
+    <div class="stats-row">
+      <div class="stat-bubble"><div class="val">7</div><div class="lbl">Days</div></div>
+      <div class="stat-bubble"><div class="val">4</div><div class="lbl">Meals/Day</div></div>
+      <div class="stat-bubble"><div class="val">28</div><div class="lbl">Menus</div></div>
+    </div>
+
+    <div class="hero-buttons">
+      <a href="/dashboard" class="btn btn-primary">🍽️ Explore Menu</a>
+      <a href="/search"    class="btn btn-outline">🔍 Search Food</a>
+    </div>
+    <div class="feature-buttons">
+      <a href="/ratings"    class="btn btn-amber">⭐ Rate Dishes</a>
+      <a href="/comparison" class="btn btn-green">💰 Mess vs Outside</a>
+      <a href="/meallog"    class="btn btn-cyan">📝 Meal Log</a>
+    </div>
+  </div>
+
+  <div class="top-picks">
+    <h2>⭐ Top Rated This Week</h2>
+    <div class="top-grid">
+      <div th:each="sr : ${topItems}" class="top-card">
+        <div class="name" th:text="${sr.item().name}"></div>
+        <div class="info" th:text="${sr.day()} + ' · ' + ${sr.meal()}"></div>
+        <div class="rating"
+             th:classappend="${sr.item().rating >= 4.0 ? 'rating-good' : (sr.item().rating >= 3.0 ? 'rating-ok' : 'rating-bad')}"
+             th:text="${#numbers.formatDecimal(sr.item().rating,1,1)}"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

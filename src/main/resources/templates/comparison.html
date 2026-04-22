@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Mess vs Outside – Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="back-btn">← Back</a>
+  <h1>💰 Mess vs Outside Food</h1>
+</div>
+
+<div class="page" style="padding-top:20px">
+
+  <div class="section-title">📊 Per Meal Cost Comparison</div>
+
+  <!-- Header row -->
+  <div class="table-row header">
+    <span>Meal</span>
+    <span>Mess (₹)</span>
+    <span>Outside (₹)</span>
+    <span class="col-save">You Save</span>
+  </div>
+
+  <div class="table-row">
+    <span>🌅 Breakfast</span>
+    <span class="col-mess" th:text="'₹' + ${messPerMeal}"></span>
+    <span class="col-out"  th:text="'₹' + ${outsideBreakfast}"></span>
+    <span class="col-save" th:text="'₹' + (${outsideBreakfast} - ${messPerMeal})"></span>
+  </div>
+  <div class="table-row">
+    <span>🍛 Lunch</span>
+    <span class="col-mess" th:text="'₹' + ${messPerMeal}"></span>
+    <span class="col-out"  th:text="'₹' + ${outsideLunch}"></span>
+    <span class="col-save" th:text="'₹' + (${outsideLunch} - ${messPerMeal})"></span>
+  </div>
+  <div class="table-row">
+    <span>🍿 Snacks</span>
+    <span class="col-mess" th:text="'₹' + ${messPerMeal}"></span>
+    <span class="col-out"  th:text="'₹' + ${outsideSnacks}"></span>
+    <span class="col-save" th:text="'₹' + (${outsideSnacks} - ${messPerMeal})"></span>
+  </div>
+  <div class="table-row">
+    <span>🌙 Dinner</span>
+    <span class="col-mess" th:text="'₹' + ${messPerMeal}"></span>
+    <span class="col-out"  th:text="'₹' + ${outsideDinner}"></span>
+    <span class="col-save" th:text="'₹' + (${outsideDinner} - ${messPerMeal})"></span>
+  </div>
+
+  <div style="margin-top:30px" class="section-title">📅 Monthly Summary</div>
+
+  <div class="summary-card">
+    <span class="sc-label">🏫 Mess Monthly Cost</span>
+    <span class="sc-val" style="color:var(--green)" th:text="'₹' + ${messMonthly}"></span>
+  </div>
+  <div class="summary-card">
+    <span class="sc-label">🛵 Outside Monthly Cost</span>
+    <span class="sc-val" style="color:var(--red)" th:text="'₹' + ${outsideMonthly}"></span>
+  </div>
+  <div class="summary-card">
+    <span class="sc-label">💰 Monthly Savings with Mess</span>
+    <span class="sc-val" style="color:var(--amber)" th:text="'₹' + ${savings}"></span>
+  </div>
+
+  <div class="advice-card">
+    <div class="ac-title">💡 Smart Tip</div>
+    <p th:text="'Eating in mess saves you approximately ₹' + ${savings} + ' per month!'"></p>
+    <p th:text="'That\'s ₹' + ${savingsYearly} + '/year — enough for a new phone! 📱'"
+       style="color:var(--text-secondary)"></p>
+  </div>
+
+</div>
+</body>
+</html>

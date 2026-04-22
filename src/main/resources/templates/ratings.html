@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Rate Dishes – Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="back-btn">← Back</a>
+  <h1>⭐ Rate Mess Dishes</h1>
+</div>
+
+<div class="page" style="padding-top:16px">
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+    Click stars to rate. Ratings are saved automatically!
+  </p>
+
+  <!-- grouped: Map<day, Map<meal, List<RatingEntry>>> -->
+  <div th:each="dayEntry : ${grouped}" class="day-section">
+    <div class="day-heading" th:text="'📅 ' + ${dayEntry.key}"></div>
+
+    <div th:each="mealEntry : ${dayEntry.value}">
+      <div class="meal-heading" th:text="${mealEntry.key}"></div>
+
+      <div th:each="entry : ${mealEntry.value}" class="dish-row">
+        <span class="dr-name"
+              th:text="${entry.item().name} + '  (' + ${entry.item().calories} + ' Kcal)'"></span>
+        <div class="stars" th:data-dish="${entry.item().name}">
+          <button th:each="i : ${#numbers.sequence(1,5)}"
+                  type="button"
+                  class="star-btn"
+                  th:classappend="${i <= entry.userRating() ? ' filled' : ''}"
+                  th:data-value="${i}"
+                  th:text="${i <= entry.userRating() ? '★' : '☆'}"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Rating saved!</div>
+
+<script>
+  document.querySelectorAll('.stars').forEach(starsEl => {
+    const dish = starsEl.dataset.dish;
+    const btns = starsEl.querySelectorAll('.star-btn');
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.dataset.value);
+        btns.forEach((b, i) => {
+          if (i < val) { b.textContent = '★'; b.classList.add('filled'); }
+          else         { b.textContent = '☆'; b.classList.remove('filled'); }
+        });
+        fetch('/ratings/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'dish=' + encodeURIComponent(dish) + '&stars=' + val
+        });
+        showToast();
+      });
+    });
+  });
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+</script>
+</body>
+</html>

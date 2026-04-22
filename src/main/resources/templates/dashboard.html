@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard – Mess Advisor</title>
+  <link rel="stylesheet" th:href="@{/app.css}"/>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="back-btn">← Back</a>
+  <h1>🍽️ Daily Menu Explorer</h1>
+</div>
+
+<div class="page">
+  <!-- Day pills -->
+  <div class="nav-row">
+    <a th:each="d : ${days}"
+       th:href="@{/dashboard(day=${d}, meal=${selectedMeal})}"
+       th:text="${d.substring(0,3)}"
+       th:classappend="${d == selectedDay ? ' active' : ''}"
+       class="pill"></a>
+  </div>
+
+  <!-- Meal tabs -->
+  <div class="nav-row">
+    <a th:each="m : ${mealTypes}"
+       th:href="@{/dashboard(day=${selectedDay}, meal=${m})}"
+       th:text="${m}"
+       th:classappend="${m == selectedMeal ? ' meal-active' : ''}"
+       class="pill"></a>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict-card" th:classappend="${verdictLevel}">
+    <div class="v-icon"
+         th:text="${verdictLevel == 'excellent' ? '🎉' : (verdictLevel == 'decent' ? '😐' : '🚫')}"></div>
+    <div>
+      <div class="v-title" th:text="${verdict}"></div>
+      <div class="v-advice" th:text="${advice}"></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="s-icon">🔥</span>
+      <div>
+        <div class="s-val" th:text="${totalCal} + ' Kcal'"></div>
+        <div class="s-lbl">Total</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="s-icon">⭐</span>
+      <div>
+        <div class="s-val" th:text="${avgRating} + ' / 5.0'"></div>
+        <div class="s-lbl">Avg Rating</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="s-icon">📋</span>
+      <div>
+        <div class="s-val" th:text="${itemCount}"></div>
+        <div class="s-lbl">Items</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Food grid -->
+  <div class="food-grid">
+    <div th:each="item : ${items}" class="food-card">
+      <div class="fc-top">
+        <span class="fc-name" th:text="${item.name}"></span>
+        <span class="fc-cat"
+              th:classappend="'cat-' + ${item.category.toLowerCase()}"
+              th:text="${item.category.toUpperCase()}"></span>
+      </div>
+      <div class="fc-bot">
+        <span class="fc-cal" th:text="'🔥 ' + ${item.calories} + ' Kcal'"></span>
+        <span th:if="${item.staple}" class="fc-staple">STAPLE</span>
+        <span th:unless="${item.staple}"
+              class="fc-rating"
+              th:classappend="${item.rating >= 4.0 ? 'rating-good' : (item.rating >= 3.0 ? 'rating-ok' : 'rating-bad')}"
+              th:text="${#numbers.formatDecimal(item.rating,1,1)}"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
